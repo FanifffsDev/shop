@@ -1,0 +1,14 @@
+:root {
+    --main-text-color: #212121; 
+    --secondary-text-color: #808080;
+    --background-color: #F7F7F7;
+    --panel-color: #FFFFFF;
+    --highlight-color: #F73E98;
+    --highlight-color-dimed: #db3485;
+    --premium-badge-color: #f3e7b3;
+}
+
+body{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+}
