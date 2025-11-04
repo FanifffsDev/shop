@@ -1,40 +1,4 @@
-body{
-    background-color:rgb(84, 124, 124);
-}
-
-/* Loading Screen */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-container p {
-  font-size: 16px;
-  margin: 0;
-}
-
-/* Error Screens */
-.error-container {
+.telegram__container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -47,25 +11,25 @@ body{
   box-sizing: border-box;
 }
 
-.telegram-error-icon {
+.telegram__error_icon {
   font-size: 64px;
   margin-bottom: 16px;
 }
 
-.error-container h2 {
+.telegram__container h2 {
   color: #dc3545;
   margin-bottom: 16px;
   font-size: 24px;
 }
 
-.error-container p {
+.telegram__container p {
   font-size: 16px;
   margin-bottom: 20px;
   max-width: 400px;
   line-height: 1.5;
 }
 
-.telegram-instructions {
+.telegram__instructions {
   background: white;
   border-radius: 8px;
   padding: 20px;
@@ -74,23 +38,23 @@ body{
   max-width: 400px;
 }
 
-.telegram-instructions p {
+.telegram__instructions p {
   margin: 0 0 12px 0;
   font-weight: 600;
 }
 
-.telegram-instructions ol {
+.telegram__instructions ol {
   margin: 12px 0 0 0;
   padding-left: 20px;
 }
 
-.telegram-instructions li {
+.telegram__instructions li {
   margin-bottom: 8px;
   font-size: 14px;
 }
 
-.error-container button,
-.telegram-redirect-btn {
+.telegram__container button,
+.telegram__redirect_btn {
   background-color: #0088cc;
   color: white;
   border: none;
@@ -105,47 +69,45 @@ body{
   min-width: 160px;
 }
 
-.error-container button:hover,
-.telegram-redirect-btn:hover {
+.telegram__container button:hover,
+.telegram__redirect_btn:hover {
   background-color: #006ba3;
   transform: translateY(-1px);
 }
 
-.error-container button:active,
-.telegram-redirect-btn:active {
+.telegram__container button:active,
+.telegram__redirect_btn:active {
   transform: translateY(0);
 }
 
-/* Responsive design */
 @media (max-width: 480px) {
-  .loading-container p,
-  .error-container p {
+  .telegram__container p {
     padding: 0 20px;
     font-size: 14px;
   }
   
-  .error-container h2 {
+  .telegram__container h2 {
     font-size: 20px;
   }
   
-  .error-container button,
-  .telegram-redirect-btn {
+  .telegram__container button,
+  .telegram__redirect_btn {
     padding: 10px 20px;
     font-size: 14px;
     margin: 6px;
     min-width: 140px;
   }
   
-  .telegram-instructions {
+  .telegram__instructions {
     margin: 16px 0;
     padding: 16px;
   }
   
-  .telegram-error-icon {
+  .telegram__error_icon {
     font-size: 48px;
   }
   
-  .telegram-instructions ol {
+  .telegram__instructions ol {
     padding-left: 16px;
   }
 }
