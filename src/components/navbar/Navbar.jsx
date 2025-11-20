@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Home, ShoppingBag, User, Settings, History } from 'lucide-react'
 import styles from './navbar.module.css'
 
+import { authFetch } from '../../utils/authUtils'
+
 function Navbar({ activeTab, setActiveTab }) {
   const tabs = [
     { id: 'catalog', icon: <Home size={22} />, label: 'Catalog' },
@@ -11,12 +13,18 @@ function Navbar({ activeTab, setActiveTab }) {
     { id: 'settings', icon: <Settings size={22} />, label: 'Settings' },
   ]
 
+
+
+  const getProfile = () =>{
+    authFetch('api/v1/users/profile');
+  };
+
   return (
     <nav className={styles.navbar}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => setActiveTab(tab.id)}
+          onClick={() => getProfile()}
           className={`${styles.navButton} ${
             activeTab === tab.id ? styles.active : ''
           }`}

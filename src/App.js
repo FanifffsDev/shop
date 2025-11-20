@@ -3,34 +3,24 @@ import "./common.css";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RequireTelegram from "./components/notInTelegram/RequireTelegram";
-import { init } from "@telegram-apps/sdk";
 import { isTMA } from "@telegram-apps/bridge";
+import { setToken } from "./utils/authUtils";
 
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-    <div className="text-center">
-      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p className="text-gray-700 text-lg font-medium">Authenticating...</p>
-    </div>
-  </div>
-);
+import errorStyles from "./styles/errorDisplay.module.css";
+import StartScreen from "./components/StartScreen/StartScreen";
+import LoadingSpinner from "./components/loadingSpinner/LoadingSpinner";
 
 const ErrorDisplay = ({ error, onRetry }) => (
-  <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center">
-      <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div className={errorStyles.container}>
+    <div className={errorStyles.card}>
+      <div className={errorStyles.iconCircle}>
+        <svg className={errorStyles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">Authentication Failed</h2>
-      <p className="text-gray-600 mb-6">{error}</p>
-      <button 
-        onClick={onRetry}
-        className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-medium"
-      >
-        Retry
-      </button>
+      <h2 className={errorStyles.title}>Authentication Failed</h2>
+      <p className={errorStyles.message}>{error}</p>
+      <button onClick={onRetry} className={errorStyles.button}>Retry</button>
     </div>
   </div>
 );
@@ -38,17 +28,8 @@ const ErrorDisplay = ({ error, onRetry }) => (
 const useAuth = () => {
   const [isAuth, setIsAuth] = useState(false);
   const [initTgData, setInitData] = useState(null);
-  const [isInTelegram, setIsInTelegram] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const isInTelegramEnv = () => {
-    try {
-      return isTMA();
-    } catch {
-      return false;
-    }
-  };
 
   const authenticate = async (dataToSend) => {
     try {
@@ -56,13 +37,23 @@ const useAuth = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          initData: dataToSend
+          initData: dataToSend,
+          timestamp: Date.now()
         }),
       });
 
       if (res.ok) {
-        setIsAuth(true);
-        setError(null);
+        const authHeader = res.headers.get("Authorization");
+        if (authHeader && authHeader.startsWith("tma ")) {
+          const token = authHeader.substring("tma ".length);
+          setToken(token);
+          setIsAuth(true);
+        }
+        else{
+          setIsAuth(false);
+          setError(null);
+        }
+
       } else {
         throw new Error(`Authentication failed with status: ${res.status}`);
       }
@@ -75,7 +66,7 @@ const useAuth = () => {
   };
 
   useEffect(() => {
-    const insideTg = isInTelegramEnv();
+    /*const insideTg = isInTelegramEnv();
     setIsInTelegram(insideTg);
 
     if (!insideTg) {
@@ -99,14 +90,13 @@ const useAuth = () => {
       }
 
       return;
-    }
+    }*/
 
     try {
       const initDataUnsafe = window.Telegram.WebApp.initDataUnsafe;
       const initData = window.Telegram.WebApp.initData;
 
       if(!initData || !initDataUnsafe){
-        setIsAuth(false);
         console.error("Error retrieving Telegram launch params: No init data found.");
         setError("Failed to retrieve Telegram launch parameters.");
         setIsLoading(false);
@@ -127,13 +117,26 @@ const useAuth = () => {
     setError(null);
     setIsLoading(true);
     window.location.reload();
-  };
+  }; 
 
-  return { isAuth, initTgData, isInTelegram, isLoading, error, retry };
+  
+
+  return { isAuth, initTgData, isLoading, error, retry, };
 };
 
+const isInTelegramEnv = () => {
+  try {
+    return isTMA();
+  } catch {
+    return false;
+  }
+}
+
 function App() {
-  const { isAuth, initTgData, isInTelegram, isLoading, error, retry } = useAuth();
+  const { isAuth, initTgData, isLoading, error, retry } = useAuth();
+
+  const isInTelegram  = isInTelegramEnv();
+
 
   if (!isInTelegram) {
     return <RequireTelegram />;
@@ -150,19 +153,21 @@ function App() {
   if (isAuth) {
     return (
       <BrowserRouter>
-        <Navbar />
         <Routes>
           <Route
+            path="/home"
+            element={<Navbar />}
+          />
+          <Route
             path="*"
-            element={<Navbar />}             
+            element={<StartScreen />}
           />
         </Routes>
       </BrowserRouter>
     );
   }
 
-  // Fallback
-  return <LoadingSpinner />;
+  return <StartScreen />;
 }
 
 export default App;
